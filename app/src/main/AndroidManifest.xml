@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- تم إضافة إذن خدمة المقدمة للأمام (foreground service) لمعالجة التنزيلات -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <queries>
         <package android:name="com.mxtech.videoplayer.ad" />
@@ -66,7 +68,8 @@
         <activity
             android:name=".InternalPlayerActivity"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="false" />
 
         <service
             android:name=".download.AlmashDownloadService"
