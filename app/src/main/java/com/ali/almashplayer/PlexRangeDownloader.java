@@ -44,6 +44,14 @@ public class PlexRangeDownloader {
         // عند الاستئناف نتأكد أن الفلاغ ملغي
         item.setCancelled(false);
         createChannelIfNeeded(context);
+
+        // تأكد من بدء الخدمة في foreground لحماية التنزيل من قتل النظام
+        try {
+            DownloadForegroundService.start(context, item);
+        } catch (Exception ex) {
+            Log.w(TAG, "Failed to start foreground service", ex);
+        }
+
         new Thread(() -> runDownloadLoop(context, item, destFile)).start();
     }
 
@@ -70,9 +78,12 @@ public class PlexRangeDownloader {
         // أول إشعار عند بدء / استئناف التحميل
         showOrUpdateNotification(context, item);
 
+        // استخدم ملف جزئي .part للاستئناف ولضمان عدم استخدام ملف نهائي تالف
+        File partFile = new File(destFile.getAbsolutePath() + ".part");
+
         while (attempt < MAX_RETRY && !success) {
             // حجم الملف الموجود حالياً على القرص
-            long downloadedBytes = destFile.exists() ? destFile.length() : 0;
+            long downloadedBytes = partFile.exists() ? partFile.length() : 0;
             item.setDownloadedBytes(downloadedBytes);
 
             // لو تم إلغاء التحميل قبل بدء المحاولة الحالية نخرج
@@ -130,8 +141,8 @@ public class PlexRangeDownloader {
 
                 in = body.byteStream();
 
-                // نفتح الملف بشكل يسمح بالاستئناف
-                raf = new RandomAccessFile(destFile, "rw");
+                // نفتح الملف الجزئي بشكل يسمح بالاستئناف
+                raf = new RandomAccessFile(partFile, "rw");
                 raf.seek(downloadedBytes);
 
                 byte[] buffer = new byte[1024 * 256]; // 256KB
@@ -216,13 +227,41 @@ public class PlexRangeDownloader {
 
                 // اكتمل التحميل (ولم يُلغَ)
                 if (!item.isCancelled()) {
-                    item.setStatus(DownloadItem.STATUS_COMPLETED);
-                    item.setProgress(100);
-                    item.setFilePath(destFile.getAbsolutePath());
-                    item.setDownloadedBytes(downloadedBytes);
-                    postItemUpdate(context, item);
-                    Log.d(TAG, "download completed: " + destFile.getAbsolutePath());
-                    cancelNotification(context, item, true);
+                    // تشفير الملف الجزئي إلى الملف النهائي إن كان الجهاز يدعم ذلك
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            File finalFile = destFile;
+                            // ensure parent dir exists
+                            File parent = finalFile.getParentFile();
+                            if (parent != null && !parent.exists()) parent.mkdirs();
+
+                            EncryptUtils.encryptFileToFile(partFile, finalFile);
+                            // حذف الملف الجزئي بعد نجاح التشفير
+                            if (partFile.exists()) partFile.delete();
+
+                            item.setFilePath(finalFile.getAbsolutePath());
+                        } else {
+                            // أجهزة قديمة: نعيد تسمية الملف الجزئي إلى النهائي بدون تشفير
+                            if (partFile.exists()) {
+                                if (partFile.renameTo(destFile)) {
+                                    item.setFilePath(destFile.getAbsolutePath());
+                                }
+                            }
+                        }
+
+                        item.setStatus(DownloadItem.STATUS_COMPLETED);
+                        item.setProgress(100);
+                        item.setDownloadedBytes(downloadedBytes);
+                        postItemUpdate(context, item);
+                        Log.d(TAG, "download completed: " + destFile.getAbsolutePath());
+                        cancelNotification(context, item, true);
+                    } catch (Exception encEx) {
+                        Log.e(TAG, "encryption/rename failed", encEx);
+                        item.setStatus(DownloadItem.STATUS_FAILED);
+                        postItemUpdate(context, item);
+                        cancelNotification(context, item, false);
+                        return;
+                    }
                 }
 
                 success = true;
