@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- شريط تبويبات أقسام مكتبة الأفلام -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabMoviesCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000"
+        app:tabIndicatorColor="#E50914"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@color/tab_text_color"
+        app:tabTextAppearance="@style/TabTextAppearance.Unselected"
+        app:tabSelectedTextAppearance="@style/TabTextAppearance.Selected" />
+
+    <!-- شريط علوي صغير للعنوان + البحث + الفلترة -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/txtMoviesTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="أفلام"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnSearchMovies"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_search"
+            android:tint="@android:color/white"
+            android:contentDescription="بحث" />
+
+        <ImageButton
+            android:id="@+id/btnFilterMovies"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:tint="@android:color/white"
+            android:contentDescription="فلترة" />
+    </LinearLayout>
+
+    <!-- شبكة عرض الأفلام -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMovies"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="72dp" />
+    <!-- 72dp تقريبًا ارتفاع الشريط السفلي الذي يغطي العناصر -->
+
+</LinearLayout>

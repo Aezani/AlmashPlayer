@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#101018">
+
+    <TextView
+        android:id="@+id/tv_channel_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="اسم القناة"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#FFCC33" />
+
+    <TextView
+        android:id="@+id/tv_channel_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="وصف القناة"
+        android:textSize="14sp"
+        android:textColor="#CCCCCC"
+        android:layout_marginTop="4dp" />
+
+    <!-- أزرار الاختيار، تظهر فقط للقناة المختارة -->
+    <LinearLayout
+        android:id="@+id/layout_player_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn_play_internal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="تشغيل داخلي"
+            android:textSize="12sp"
+            android:background="#304FFE"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btn_play_mx"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MX Player"
+            android:textSize="12sp"
+            android:background="#00ACC1"
+            android:textColor="#FFFFFF"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btn_play_vlc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="VLC"
+            android:textSize="12sp"
+            android:background="#FF6D00"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+
+</LinearLayout>
